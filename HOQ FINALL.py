@@ -138,13 +138,14 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- BAGIAN HEADER BARU DENGAN LOGO ELITE ---
+# --- BAGIAN HEADER BARU DENGAN URL LOGO ELITE ---
 # Membuat 2 kolom layout (kolom_logo lebar 1, kolom_judul lebar 12 agar text memanjang rapi)
 col_logo, col_title = st.columns([1, 12])
 
 with col_logo:
-    # Memanggil file gambar ELITE yang kamu upload
-    st.image("ELITE UG (Original).png", width=95)
+    # ⚠️ PENTING: Ganti 'NatanaelBayu' di bawah ini dengan Username GitHub-mu yang asli jika berbeda
+    url_gambar = "https://raw.githubusercontent.com/natanaelbayu/fix-goool-hoq/main/ELITE%20UG%20%28Original%29.png"
+    st.image(url_gambar, width=95)
 
 with col_title:
     # Judul ditarik sedikit ke atas dengan margin-top agar simetris dengan logo di sampingnya
