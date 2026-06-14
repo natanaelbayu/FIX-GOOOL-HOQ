@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import base64
+import os
 
 # 1. SETTING HALAMAN & STYLE HOQ RUMAH
 st.set_page_config(page_title="Digital HoQ - Praktikum PTI 1", layout="wide")
@@ -138,14 +140,27 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- BAGIAN HEADER BARU DENGAN URL LOGO ELITE ---
-# Membuat 2 kolom layout (kolom_logo lebar 1, kolom_judul lebar 12 agar text memanjang rapi)
+# --- FUNGSI AMAN UNTUK AMBIL LOGO (MENGHINDARI EROR STORAGE & LINK PECAH) ---
+def get_base64_image(image_path):
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    return None
+
+# Coba muat file lokal yang sudah kamu push ke GitHub kamu
+file_logo_nama = "ELITE UG (Original).png"
+image_base64 = get_base64_image(file_logo_nama)
+
+# --- BAGIAN HEADER BARU ---
 col_logo, col_title = st.columns([1, 12])
 
 with col_logo:
-    # ⚠️ PENTING: Ganti 'NatanaelBayu' di bawah ini dengan Username GitHub-mu yang asli jika berbeda
-    url_gambar = "https://raw.githubusercontent.com/natanaelbayu/fix-goool-hoq/main/ELITE%20UG%20%28Original%29.png"
-    st.image(url_gambar, width=95)
+    if image_base64:
+        # Jika file ditemukan lokal di repo GitHub, tampilkan lewat tag HTML Base64 (Anti-Eror)
+        st.markdown(f'<img src="data:image/png;base64,{image_base64}" width="95">', unsafe_allow_html=True)
+    else:
+        # Jika file hilang/tidak terbaca sama sekali, gunakan fallback sistem cadangan agar tidak blank eror
+        st.write("🏛️")
 
 with col_title:
     # Judul ditarik sedikit ke atas dengan margin-top agar simetris dengan logo di sampingnya
