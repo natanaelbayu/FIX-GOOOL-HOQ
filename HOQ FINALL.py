@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import base64
-import os
 
 # 1. SETTING HALAMAN & STYLE HOQ RUMAH
 st.set_page_config(page_title="Digital HoQ - Praktikum PTI 1", layout="wide")
@@ -140,27 +138,14 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- FUNGSI AMAN UNTUK AMBIL LOGO (MENGHINDARI EROR STORAGE & LINK PECAH) ---
-def get_base64_image(image_path):
-    if os.path.exists(image_path):
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-    return None
 
-# Coba muat file lokal yang sudah kamu push ke GitHub kamu
-file_logo_nama = "ELITE UG (Original).png"
-image_base64 = get_base64_image(file_logo_nama)
-
-# --- BAGIAN HEADER BARU ---
+# --- BAGIAN HEADER BARU DENGAN LINK ALTERNATIF STABIL ---
 col_logo, col_title = st.columns([1, 12])
 
 with col_logo:
-    if image_base64:
-        # Jika file ditemukan lokal di repo GitHub, tampilkan lewat tag HTML Base64 (Anti-Eror)
-        st.markdown(f'<img src="data:image/png;base64,{image_base64}" width="95">', unsafe_allow_html=True)
-    else:
-        # Jika file hilang/tidak terbaca sama sekali, gunakan fallback sistem cadangan agar tidak blank eror
-        st.write("🏛️")
+    # Menggunakan URL eksternal langsung agar terbebas dari eror internal storage Streamlit Cloud
+    url_logo_elite = "https://images2.imgbox.com/71/24/YyYfD1z9_o.png"
+    st.image(url_logo_elite, width=95)
 
 with col_title:
     # Judul ditarik sedikit ke atas dengan margin-top agar simetris dengan logo di sampingnya
