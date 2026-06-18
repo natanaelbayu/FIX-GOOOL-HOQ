@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import os
-import base64
 
 # 1. SETTING HALAMAN & STYLE HOQ RUMAH
 st.set_page_config(page_title="Digital HoQ - Praktikum PTI 1", layout="wide")
@@ -14,40 +12,19 @@ st.markdown("""
         background-color: #ffffff;
     }
 
-    /* Layout Header Terintegrasi */
-    .header-container {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #f3f4f6;
-    }
-    
-    .logo-box {
-        flex-shrink: 0;
-    }
-
-    .text-box {
-        flex-grow: 1;
-    }
-
     /* Judul Utama dengan warna Biru Indigo Cerah */
     .main-header { 
         font-size: 32px; 
         font-weight: bold; 
         color: #4f46e5; 
-        margin: 0;
-        padding: 0;
-        line-height: 1.2;
+        margin-bottom: 5px; 
     }
     
     /* Sub-judul dengan warna Abu-abu Medium */
     .sub-header { 
         font-size: 18px; 
         color: #6b7280; 
-        margin: 5px 0 0 0;
-        padding: 0;
+        margin-bottom: 25px; 
     }
     
     /* === Style Tabel Rumah HoQ untuk Tema Terang & Full Color === */
@@ -58,80 +35,91 @@ st.markdown("""
         width: 100%;
         border-radius: 12px;
         overflow: hidden;
+        /* Menambahkan shadow agar tabel terlihat mengambang */
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         background-color: #ffffff;
         border: none;
     }
     
+    /* Mengatur border dan padding dasar untuk semua sel */
     .hoq-table th, .hoq-table td {
         border: 1px solid #e5e7eb;
         padding: 14px;
         text-align: center;
         font-size: 14px;
-        color: #1f2937 !important;
+        color: #1f2937 !important; /* Warna teks default gelap agar terbaca jelas */
     }
 
+    /* === Warna Kepala Tabel (Headers) === */
+    /* Pojok kiri atas (Ungu Pastel) */
     .hoq-th-corner {
         background-color: #ede9fe !important;
         font-weight: 700;
         color: #4c1d95 !important;
     }
-    
+    /* Header spesifikasi teknis / HOWs (Pink Pastel) */
     .hoq-th-hows {
         background-color: #fce7f3 !important; 
         color: #9d174d !important;  
         font-weight: 700;
     }
-    
+    /* Header Importance (Hijau Tosca Pastel) */
     .hoq-importance-header {
         background-color: #ccfbf1 !important;
         color: #115e59 !important;
         font-weight: 700;
     }
 
+    /* === Warna Badan Tabel (Isi Utama) === */
+    /* Kolom Kebutuhan Konsumen / WHATs (Biru Langit Pastel) */
     .hoq-td-whats {
         background-color: #e0f2fe !important;
         text-align: left !important;
         font-weight: 600;
         color: #075985 !important;
     }
-    
+    /* Kolom Angka Importance (Kuning Pastel) */
     .hoq-importance {
         background-color: #fef3c7 !important;
         font-weight: 700;
         color: #92400e !important;
     }
     
+    /* === Warna Bagian Dalam (Sel Korelasi yang Sebelumnya Hitam) === */
+    /* Kita beri warna Abu-abu Sangat Muda agar teks 0 terlihat bersih, tidak gelap */
     .hoq-table td:not([class]):not([style]) {
         background-color: #f9fafb !important;
         color: #4b5563 !important;
     }
     
+    /* === Warna Fondasi Bawah (Hasil Akhir) === */
+    /* Baris Weighted Importance Score (Oranye Pastel) */
     .hoq-score-row {
         background-color: #ffedd5 !important;
         font-weight: bold;
         color: #9a3412 !important;
         border-top: 3px solid #fdba74;
     }
-    
+    /* Baris Relative Importance % (Merah Pastel) */
     .hoq-weight-row {
         background-color: #fee2e2 !important;
         font-weight: bold;
         color: #991b1b !important;
     }
     
+    /* === Style Khusus untuk Atap Segitiga di Tab 6 === */
     .roof-blank {
         background-color: transparent !important;
         border: none !important;
     }
-    
     .roof-cell {
-        background-color: #f3f4f6;
+        background-color: #f3f4f6; /* Abu-abu muda untuk sel atap */
         border: 1px solid #d1d5db !important;
         font-weight: bold;
         color: #1f2937 !important;
     }
     
+    /* Legend Info Box dengan gradient cerah */
     .legend-box {
         background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
         padding: 20px;
@@ -141,6 +129,7 @@ st.markdown("""
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
     
+    /* Responsive Container */
     .hoq-scroll-container {
         width: 100%;
         overflow-x: auto;
@@ -149,48 +138,35 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# --- BAGIAN HEADER BARU DENGAN URL LOGO ELITE ---
+# Membuat 2 kolom layout (kolom_logo lebar 1, kolom_judul lebar 12 agar text memanjang rapi)
+col_logo, col_title = st.columns([1, 12])
 
-# --- BAGIAN PARSING LOGO BASE64 LOKAL ---
-file_baca_logo = "ELITE UG (Original).png"
-img_html = ""
+with col_logo:
+    # ⚠️ PENTING: Ganti 'NatanaelBayu' di bawah ini dengan Username GitHub-mu yang asli jika berbeda
+    url_gambar = "https://raw.githubusercontent.com/NatanaelBayu/fix-goool-hoq/main/ELITE%20UG%20%28Original%29.png"
+    st.image(url_gambar, width=95)
 
-# Memeriksa apakah file ada di direktori server, lalu mengonversinya ke Base64 HTML string
-if os.path.exists(file_baca_logo):
-    with open(file_baca_logo, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read()).decode()
-    img_html = f'<img src="data:image/png;base64,{encoded_string}" width="90" style="display: block; border-radius: 8px;">'
-else:
-    # Backup emoji bangunan jika file secara tak terduga hilang agar layout tidak berantakan
-    img_html = '<span style="font-size: 50px;">🏛️</span>'
-
-# Render Header menggunakan HTML Flexbox murni agar posisi teks dan gambar selalu presisi sejajar
-st.markdown(f"""
-<div class="header-container">
-    <div class="logo-box">
-        {img_html}
-    </div>
-    <div class="text-box">
-        <p class="main-header">Digital House of Quality (HoQ)</p>
-        <p class="sub-header">Optimalisasi Spesifikasi Teknis berdasarkan Voice of Customer</p>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+with col_title:
+    # Judul ditarik sedikit ke atas dengan margin-top agar simetris dengan logo di sampingnya
+    st.markdown('<p class="main-header" style="margin-top: 5px;">Digital House of Quality (HoQ)</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Optimalisasi Spesifikasi Teknis berdasarkan Voice of Customer</p>', unsafe_allow_html=True)
 
 
 # 2. INISIALISASI DATA (Session State Utama)
 if 'df_whats' not in st.session_state:
     st.session_state.df_whats = pd.DataFrame({
-        "Customer Requirement (WHATs)": ["Memiliki kapasitas besar", "Mempertimbangkan kualitas material", "Memiliki sifat yang tahan lama", "Memiliki sifat bahan yang kuat","Memiliki bentuk balok","Memiliki fitur tambahan"],
+        "Customer Requirement (WHATs)": ["Tahu tidak mudah hancur", "Rasa kedelai terasa", "Warna kuning cerah", "Harga terjangkau"],
         "Importance (1-5)": [5, 4, 3, 5]
     })
 
 if 'df_hows' not in st.session_state:
     st.session_state.df_hows = pd.DataFrame({
-        "Technical Requirement (HOWs)": ["Jenis material", "Panjang", "Lebar", "Tinggi","Berat","Jenis inovasi","Jenis pelapis"],
+        "Technical Requirement (HOWs)": ["Tekanan Mesin Pres", "Kualitas Kedelai", "Lama Perebusan", "Takaran Kunyit"],
         "Direction": ["Max", "Max", "Target", "Max"]
     })
 
-# --- TABS STRUKTUR ---
+# --- TABS STRUKTUR (DENGAN PENYEMPURNAAN ANTARMUKA) ---
 t1, t2, t3, t4, t5, t6 = st.tabs([
     "1. WHATs", "2. HOWs", "3. Correlation", "4. Matrix", "5. 🏆 FINAL HOUSE & ACTION PLAN", "🏛️ 6. FULL HOQ ARCHITECTURE"
 ])
@@ -223,6 +199,7 @@ with t2:
         key="ed_hows"
     )
 
+# Filter list dinamis dari apa yang diinput user
 whats_list = [x for x in st.session_state.df_whats["Customer Requirement (WHATs)"].tolist() if pd.notna(x) and x != ""]
 hows_list = [x for x in st.session_state.df_hows["Technical Requirement (HOWs)"].tolist() if pd.notna(x) and x != ""]
 
@@ -265,6 +242,7 @@ with t4:
 # --- TAB 5: THE FINAL HOUSE & ACTION PLAN ---
 with t5:
     try:
+        # Perhitungan Nilai Matematika Utama
         valid_whats = st.session_state.df_whats[st.session_state.df_whats["Customer Requirement (WHATs)"].isin(whats_list)]
         weights = valid_whats["Importance (1-5)"].values.astype(float)
         matrix_values = st.session_state.rel_matrix.loc[whats_list, hows_list].values.astype(float)
@@ -273,6 +251,7 @@ with t5:
         total = abs_importance.sum()
         rel_importance = (abs_importance / total * 100) if total > 0 else abs_importance * 0
 
+        # DataFrame Hasil Akhir untuk Chart dan Rekomendasi
         res_df = pd.DataFrame({
             "Requirement": hows_list,
             "Score": abs_importance,
@@ -281,6 +260,7 @@ with t5:
 
         st.write("### 💡 Kesimpulan Strategis & Arah Pengembangan")
         
+        # Ekstrak 3 prioritas teratas berdasarkan perhitungan HOQ
         top_priorities = res_df.head(3)
         priority_names = top_priorities["Requirement"].tolist()
         priority_weights = top_priorities["Weight %"].tolist()
@@ -303,10 +283,19 @@ with t5:
                 st.write(f"2. **Prioritas Sekunder (Pantau Berkala):** Jaga stabilitas kualitas `{priority_names[1]}`.")
             if len(priority_names) > 2:
                 st.write(f"3. **Prioritas Tersier (Pertahankan):** Lakukan pengawasan standarisasi pada `{priority_names[2]}`.")
+
+        with st.expander("🔍 Bagaimana sistem menentukan arah rekomendasi ini?"):
+            st.write("""
+            Sistem mengalikan bobot tingkat kepentingan yang diinginkan konsumen dengan nilai efektivitas spesifikasi produksi yang Anda rancang. 
+            Nilai **Relative Importance (%)** menunjukkan porsi seberapa besar aspek teknis tersebut memengaruhi persepsi kualitas di mata konsumen. 
+            Fokus pada nilai tertinggi akan memberikan efisiensi biaya perbaikan mutu (*Return on Quality Investment*).
+            """)
             
         st.write("---")
 
-        # 1. VISUALISASI MATRIKS ATAP (HOWs vs HOWs)
+        # -------------------------------------------------------------
+        # 1. VISUALISASI MATRIKS ATAP (HOWs vs HOWs) - VERSI CERAH
+        # -------------------------------------------------------------
         st.write("### 🛖 Bagian Atap: Matriks Korelasi Antar Persyaratan Teknis")
         
         html_roof = '<table class="hoq-table">'
@@ -323,7 +312,7 @@ with t5:
                 val = st.session_state.roof_matrix.at[row_name, col_name]
                 
                 simbol = "0"
-                bg_cell = 'style="background-color: #f9fafb; color: #9ca3af;"'
+                bg_cell = 'style="background-color: #f9fafb; color: #9ca3af;"' # Default cerah netral jika 0
                 
                 if "Strong Positive" in val: 
                     simbol = "++"
@@ -345,7 +334,9 @@ with t5:
 
         st.write("")
 
-        # 2. VISUALISASI BADAN & FONDASI RUMAH HOQ
+        # -------------------------------------------------------------
+        # 2. VISUALISASI BADAN & FONDASI RUMAH HOQ - VERSI CERAH
+        # -------------------------------------------------------------
         st.write("### 🏢 Bagian Utama & Fondasi: Matriks Hubungan Terintegrasi")
         
         html_body = '<table class="hoq-table">'
@@ -363,7 +354,8 @@ with t5:
             html_body += f'<td class="hoq-importance">{int(imp_val)}</td>'
             for col_name in hows_list:
                 score_val = st.session_state.rel_matrix.at[row_name, col_name]
-                bg_cell = 'style="background-color: #f9fafb; color: #9ca3af;"'
+                
+                bg_cell = 'style="background-color: #f9fafb; color: #9ca3af;"' # Default cerah jika 0
                 
                 if score_val == 9: 
                     bg_cell = 'style="background-color: #ffe4e6; color: #9f1239; font-weight: 600;"' 
@@ -375,6 +367,7 @@ with t5:
                 html_body += f'<td {bg_cell}>{int(score_val)}</td>'
             html_body += '</tr>'
             
+        # Fondasi: Absolute Importance
         html_body += '<tr class="hoq-score-row">'
         html_body += '<td style="text-align: right; font-weight: bold;">Weighted Importance (Score)</td>'
         html_body += '<td>-</td>'
@@ -382,6 +375,7 @@ with t5:
             html_body += f'<td style="font-weight: 700;">{int(score)}</td>'
         html_body += '</tr>'
 
+        # Fondasi: Relative Weight %
         html_body += '<tr class="hoq-weight-row">'
         html_body += '<td style="text-align: right; font-weight: bold;">Relative Importance (%)</td>'
         html_body += '<td>-</td>'
@@ -393,7 +387,7 @@ with t5:
         
         st.write("---")
         
-        # 3. GRID GRAFIK BAR & BADGE STRATEGIS
+        # 3. GRID GRAFIK BAR (VERTIKAL) & BADGE STRATEGIS
         col_chart, col_rank = st.columns([1.5, 1])
         with col_chart:
             st.write("#### 📈 Grafik Kontribusi Prioritas Teknis")
@@ -416,6 +410,7 @@ with t5:
 with t6:
     try:
         st.write("### 🏛️ Arsitektur Matriks House of Quality (HoQ) Komplit")
+        st.caption("Visualisasi rumah kualitas (House Of Quality) mengintegrasikan Atap Korelasi Segitiga Piramida, Kriteria WHATs, serta Simbol Hubungan.")
         
         valid_whats = st.session_state.df_whats[st.session_state.df_whats["Customer Requirement (WHATs)"].isin(whats_list)]
         weights = valid_whats["Importance (1-5)"].values.astype(float)
@@ -427,6 +422,7 @@ with t6:
         
         n_hows = len(hows_list)
         
+        # Box Keterangan Simbol (Legend)
         st.markdown("""
         <div class="legend-box">
             <strong>ℹ️ Keterangan Simbol Hubungan Matriks (Badan Utama):</strong><br>
@@ -440,7 +436,9 @@ with t6:
         html_hoq = '<div class="hoq-scroll-container">'
         html_hoq += '<table class="hoq-table" style="width:auto; margin:auto;">'
         
-        # GENERATE ATAP SEGITIGA
+        # -------------------------------------------------------------
+        # 1. GENERATE ATAP SEGITIGA (Roof Matrix Upper Triangle) - CERAH
+        # -------------------------------------------------------------
         for i in range(n_hows - 1):
             html_hoq += '<tr>'
             html_hoq += '<td class="roof-blank" style="width:250px;"></td>'
@@ -467,9 +465,12 @@ with t6:
                     html_hoq += f'<td class="roof-cell" style="background-color: {bg_color}; color: {text_color} !important;">{simbol}</td>'
             html_hoq += '</tr>'
 
+        # Garis pembatas tipis antara atap segitiga dengan kepala tabel utama
         html_hoq += '<tr><td colspan="{}" style="background-color:#e5e7eb; padding:2px; border:none;"></td></tr>'.format(n_hows + 2)
 
-        # GENERATE KEPALA TABEL BADAN UTAMA
+        # -------------------------------------------------------------
+        # 2. GENERATE KEPALA TABEL BADAN UTAMA
+        # -------------------------------------------------------------
         html_hoq += '<tr>'
         html_hoq += '<th class="hoq-th-corner">Customer Requirements (WHATs)</th>'
         html_hoq += '<th class="hoq-importance-header">Importance</th>'
@@ -477,7 +478,9 @@ with t6:
             html_hoq += f'<th class="hoq-th-hows">{col}</th>'
         html_hoq += '</tr>'
         
-        # GENERATE BADAN MATRIKS UTAMA
+        # -------------------------------------------------------------
+        # 3. GENERATE BADAN MATRIKS UTAMA (SIMBOL CERAH)
+        # -------------------------------------------------------------
         for idx, row_name in enumerate(whats_list):
             imp_val = weights[idx]
             html_hoq += '<tr>'
@@ -485,6 +488,7 @@ with t6:
             html_hoq += f'<td class="hoq-importance">{int(imp_val)}</td>'
             for col_name in hows_list:
                 score_val = st.session_state.rel_matrix.at[row_name, col_name]
+                
                 bg_cell = 'style="background-color: #f9fafb; color: #9ca3af;"'
                 simbol_hub = ""
                 
@@ -501,7 +505,10 @@ with t6:
                 html_hoq += f'<td {bg_cell}>{simbol_hub}</td>'
             html_hoq += '</tr>'
             
-        # GENERATE FONDASI RUMAH HOQ
+        # -------------------------------------------------------------
+        # 4. GENERATE FONDASI RUMAH HOQ (CERAH)
+        # -------------------------------------------------------------
+        # Baris Absolute Importance (Score)
         html_hoq += '<tr class="hoq-score-row">'
         html_hoq += '<td style="text-align: right; font-weight: bold;">Weighted Importance (Score)</td>'
         html_hoq += '<td>-</td>'
@@ -509,6 +516,7 @@ with t6:
             html_hoq += f'<td style="font-weight: 700;">{int(score)}</td>'
         html_hoq += '</tr>'
 
+        # Baris Relative Weight (%)
         html_hoq += '<tr class="hoq-weight-row">'
         html_hoq += '<td style="text-align: right; font-weight: bold;">Relative Importance (%)</td>'
         html_hoq += '<td>-</td>'
