@@ -180,13 +180,13 @@ st.markdown(f"""
 # 2. INISIALISASI DATA (Session State Utama)
 if 'df_whats' not in st.session_state:
     st.session_state.df_whats = pd.DataFrame({
-        "Customer Requirement (WHATs)": ["Tahu tidak mudah hancur", "Rasa kedelai terasa", "Warna kuning cerah", "Harga terjangkau"],
+        "Customer Requirement (WHATs)": ["Memiliki kapasitas besar", "Mempertimbangkan kualitas material", "Memiliki sifat yang tahan lama", "Memiliki sifat bahan yang kuat","Memiliki bentuk balok","Memiliki fitur tambahan"],
         "Importance (1-5)": [5, 4, 3, 5]
     })
 
 if 'df_hows' not in st.session_state:
     st.session_state.df_hows = pd.DataFrame({
-        "Technical Requirement (HOWs)": ["Tekanan Mesin Pres", "Kualitas Kedelai", "Lama Perebusan", "Takaran Kunyit"],
+        "Technical Requirement (HOWs)": ["Jenis material", "Panjang", "Lebar", "Tinggi","Berat","Jenis inovasi","Jenis pelapis"],
         "Direction": ["Max", "Max", "Target", "Max"]
     })
 
